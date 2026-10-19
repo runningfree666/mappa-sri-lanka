@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Mappa Sri Lanka</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  :root {
+    --bg: var(--tg-theme-bg-color, #ffffff);
+    --fg: var(--tg-theme-text-color, #1b1b1f);
+    --muted: var(--tg-theme-hint-color, #6b6b75);
+    --accent: var(--tg-theme-button-color, #2f7de1);
+    --accent-fg: var(--tg-theme-button-text-color, #ffffff);
+    --card: var(--tg-theme-secondary-bg-color, #f2f3f5);
+    --line: color-mix(in srgb, var(--fg) 12%, transparent);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: var(--tg-theme-bg-color, #17181c); --fg: var(--tg-theme-text-color, #ececf1);
+      --muted: var(--tg-theme-hint-color, #9a9aa6); --card: var(--tg-theme-secondary-bg-color, #22242a);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
+    font: 15px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  header { padding: 8px 12px 6px; background: var(--bg); border-bottom: 1px solid var(--line);
+    display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+  .row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .row::-webkit-scrollbar { display: none; }
+  .chip { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--fg);
+    border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 14px; cursor: pointer; }
+  .chip[aria-pressed="false"] { opacity: .45; }
+  .chip.primary { background: var(--accent); color: var(--accent-fg); border-color: transparent; }
+  select.chip { appearance: none; padding-right: 22px;
+    background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 12px) 55%, calc(100% - 7px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+  #map { flex: 1; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+  .stats div { background: var(--card); border-radius: 10px; padding: 7px 4px; text-align: center; font-size: 12px; color: var(--muted); }
+  .stats b { display: block; font-size: 16px; color: var(--fg); }
+  .endpin { font-size: 18px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+  .pin { font-size: 22px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+  .me { width: 16px; height: 16px; border-radius: 50%; background: #2f7de1; border: 3px solid #fff;
+    box-shadow: 0 0 0 6px rgba(47,125,225,.25); }
+  #sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000; background: var(--bg);
+    border-radius: 16px 16px 0 0; box-shadow: 0 -4px 24px rgba(0,0,0,.25);
+    max-height: 72%; overflow-y: auto; transform: translateY(105%); transition: transform .22s ease;
+    padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); }
+  #sheet.open { transform: none; }
+  .grab { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 0 auto 10px; }
+  .close { float: right; border: 0; background: none; color: var(--muted); font-size: 22px; cursor: pointer; }
+  .sheet-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; background: var(--card); }
+  h2 { margin: 8px 0 2px; font-size: 19px; }
+  .meta { color: var(--muted); font-size: 14px; }
+  .note { background: var(--card); border-radius: 10px; padding: 8px 10px; margin-top: 8px; font-size: 14px; }
+  .btns { display: flex; gap: 8px; margin-top: 12px; }
+  .btn { flex: 1; text-align: center; text-decoration: none; border-radius: 10px; padding: 11px 8px;
+    background: var(--card); color: var(--fg); font-weight: 600; border: 0; font: inherit; cursor: pointer; }
+  .btn.primary { background: var(--accent); color: var(--accent-fg); }
+  .credit { color: var(--muted); font-size: 12px; margin-top: 10px; }
+  .credit a { color: inherit; }
+  ul.near { list-style: none; margin: 6px 0 0; padding: 0; }
+  ul.near li { display: flex; justify-content: space-between; gap: 8px; padding: 10px 0;
+    border-bottom: 1px solid var(--line); cursor: pointer; }
+  ul.near li span:last-child { color: var(--muted); flex: none; }
+  .leaflet-control-attribution { font-size: 10px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="row" id="tipi"></div>
+    <div class="row">
+      <select class="chip" id="zona" aria-label="Zona"><option value="">Tutte le zone</option></select>
+      <button class="chip primary" id="vicino">📍 Vicino a me</button>
+    </div>
+  </header>
+  <div id="map" role="application" aria-label="Mappa dei posti della guida"></div>
+</div>
+<div id="sheet" role="dialog" aria-modal="false"></div>
+
+<script>
+const tg = window.Telegram && Telegram.WebApp;
+if (tg && tg.initData !== undefined) { tg.ready(); tg.expand(); }
+const TIPI = {attrazione: "🏛️ Attrazioni", museo: "🖼️ Musei", paese: "🏘️ Paesi",
+              spiaggia: "🏖️ Spiagge", natura: "🌋 Natura", trek: "🥾 Trek"};
+const attivi = new Set(Object.keys(TIPI));
+let zona = "", posti = [], markers = [], linee = [], estremi = [], me = null;
+const TRACCIA = {color: "#d9480f", weight: 4, opacity: .85};
+
+const map = L.map("map", {zoomControl: false}).setView([7.6, 80.7], 7);
+L.control.zoom({position: "bottomright"}).addTo(map);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 18, attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
+}).addTo(map);
+
+const sheet = document.getElementById("sheet");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function apri(html) { sheet.innerHTML = `<div class="grab"></div><button class="close" aria-label="Chiudi">✕</button>${html}`;
+  sheet.classList.add("open"); sheet.querySelector(".close").onclick = chiudi; }
+function chiudi() { sheet.classList.remove("open"); }
+map.on("click", chiudi);
+
+function vaiLink(url, telegram) {
+  if (tg && tg.initData) { telegram ? tg.openTelegramLink(url) : tg.openLink(url); }
+  else window.open(url, "_blank", "noopener");
+}
+
+function scheda(p) {
+  const f = p.foto;
+  const img = f ? `<img class="sheet-img" src="${esc(f.url)}" alt="${esc(p.nome)}" loading="lazy">` : "";
+  const t = p.traccia;
+  const nota = t ? `<div class="note">🥾 ${esc(t.nome)} · il segnaposto è la partenza della traccia GPX.</div>
+      <div class="stats"><div><b>${String(t.km).replace(".", ",")}</b>km</div><div><b>+${t.salita}</b>m salita</div>
+      <div><b>−${t.discesa}</b>m discesa</div><div><b>${t.quota_max}</b>m max</div></div>
+      ${t.durata ? `<div class="meta" style="margin-top:6px">⏱️ ${esc(t.durata)} sola andata${t.difficolta ? " · difficoltà " + esc(t.difficolta) : ""} · dati Wikiloc</div>` : ""}`
+    : p.tipo === "trek" ? `<div class="note">📍 Punto indicativo: zona del percorso, non la partenza esatta. Dettagli e partenza nella scheda del bot.</div>` : "";
+  const btnT = t && t.linea ? `<div class="btns"><button class="btn" id="b-trk">🥾 Mostra percorso</button>${t.fonte ? '<button class="btn" id="b-gpx">⬇️ GPX (Wikiloc)</button>' : ""}</div>` : "";
+  const cred = f ? `<div class="credit">Foto: ${esc(f.autore)} · ${esc(f.licenza)} · <a href="${esc(f.pagina)}" target="_blank" rel="noopener">Wikimedia Commons</a></div>` : "";
+  apri(`${img}<h2>${p.icona} ${esc(p.nome)}</h2><div class="meta">${esc(TIPI[p.tipo].split(" ").slice(1).join(" "))} · ${esc(p.zona)}${dist(p)}</div>${nota}
+    <div class="btns"><button class="btn primary" id="b-bot">📖 Apri nel bot</button><button class="btn" id="b-nav">🧭 Portami qui</button></div>${btnT}
+    ${cred}${t && t.fonte ? `<div class="credit">Traccia: <a href="${esc(t.fonte)}" target="_blank" rel="noopener">Wikiloc</a></div>` : ""}${t ? "" : `<div class="credit">Posizione: <a href="${esc(p.osm)}" target="_blank" rel="noopener">OpenStreetMap</a></div>`}`);
+  document.getElementById("b-bot").onclick = () => vaiLink(p.bot, true);
+  if (t && t.linea) {
+    document.getElementById("b-trk").onclick = () => percorso(p);
+    if (t.fonte) document.getElementById("b-gpx").onclick = () => vaiLink(t.fonte, false);
+  }
+  document.getElementById("b-nav").onclick = () =>
+    vaiLink(`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}`, false);
+}
+
+function km(a, b) {
+  const R = 6371, r = x => x * Math.PI / 180;
+  const h = Math.sin(r(b.lat - a.lat) / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(r(b.lon - a.lon) / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+// centra il posto nella parte di mappa lasciata libera dalla scheda (in alto)
+function mostra(p, zoom) {
+  const z = Math.max(map.getZoom(), zoom || 13);
+  const pt = map.project([p.lat, p.lon], z).add([0, map.getSize().y * 0.25]);
+  map.setView(map.unproject(pt, z), z);
+}
+const dist = p => me ? ` · ${km(me, p).toFixed(1).replace(".", ",")} km` : "";
+const visibile = p => attivi.has(p.tipo) && (!zona || p.zona === zona);
+
+// percorso intero: zoom sulla linea (spazio in basso per la scheda), partenza 🟢 e arrivo 🏁
+function percorso(p) {
+  estremi.forEach(m => m.remove());
+  const l = p.traccia.linea, ico = h => L.divIcon({className: "", html: `<div class="endpin">${h}</div>`, iconSize: [20, 20], iconAnchor: [10, 10]});
+  estremi = [L.marker(l[0], {icon: ico("🟢"), title: "Partenza"}).addTo(map),
+             L.marker(l[l.length - 1], {icon: ico("🏁"), title: "Arrivo"}).addTo(map)];
+  map.fitBounds(L.latLngBounds(l), {paddingTopLeft: [30, 30], paddingBottomRight: [30, map.getSize().y * 0.55]});
+}
+
+function disegna() {
+  markers.forEach(m => m.remove());
+  linee.forEach(l => l.remove());
+  linee = posti.filter(p => p.traccia && p.traccia.linea && visibile(p)).map(p =>
+    L.polyline(p.traccia.linea, TRACCIA).on("click", e => { L.DomEvent.stopPropagation(e); scheda(p); percorso(p); }).addTo(map));
+  markers = posti.filter(visibile).map(p => L.marker([p.lat, p.lon], {
+      title: p.nome, icon: L.divIcon({className: "", html: `<div class="pin">${p.icona}</div>`, iconSize: [24, 24], iconAnchor: [12, 12]})
+    }).on("click", () => { scheda(p); mostra(p); }).addTo(map));
+}
+
+function vicini() {
+  const lista = posti.filter(visibile).map(p => [km(me, p), p]).sort((a, b) => a[0] - b[0]).slice(0, 8);
+  apri(`<h2>📍 Vicino a te</h2><ul class="near">${lista.map(([d, p], i) =>
+    `<li data-i="${i}"><span>${p.icona} ${esc(p.nome)}</span><span>${d.toFixed(1).replace(".", ",")} km</span></li>`).join("")}</ul>`);
+  sheet.querySelectorAll("li").forEach(li => li.onclick = () => {
+    const p = lista[+li.dataset.i][1]; scheda(p); mostra(p, 14); });
+}
+
+document.getElementById("vicino").onclick = () => {
+  if (!navigator.geolocation) { apri("<h2>Posizione non disponibile</h2>"); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    me = {lat: pos.coords.latitude, lon: pos.coords.longitude};
+    L.marker([me.lat, me.lon], {icon: L.divIcon({className: "", html: '<div class="me"></div>', iconSize: [16, 16]})}).addTo(map);
+    map.setView([me.lat, me.lon], 12); vicini();
+  }, () => apri("<h2>Posizione negata</h2><div class='meta'>Consenti l'accesso alla posizione a Telegram e riprova.</div>"),
+  {enableHighAccuracy: true, timeout: 15000});
+};
+
+const tipiEl = document.getElementById("tipi");
+Object.entries(TIPI).forEach(([k, label]) => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = label; b.setAttribute("aria-pressed", "true");
+  b.onclick = () => { attivi.has(k) ? attivi.delete(k) : attivi.add(k);
+    b.setAttribute("aria-pressed", attivi.has(k)); disegna(); };
+  tipiEl.appendChild(b);
+});
+const zonaEl = document.getElementById("zona");
+zonaEl.onchange = () => { zona = zonaEl.value; disegna();
+  const v = posti.filter(visibile); if (v.length) map.fitBounds(v.map(p => [p.lat, p.lon]), {padding: [30, 30]}); };
+
+fetch("posti.json").then(r => r.json()).then(d => {
+  posti = d;
+  [...new Set(d.map(p => p.zona))].forEach(z => zonaEl.add(new Option(z, z)));
+  disegna();
+  map.fitBounds(d.map(p => [p.lat, p.lon]), {padding: [20, 20]});
+});
+</script>
+</body>
+</html>
