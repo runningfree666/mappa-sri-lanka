@@ -46,13 +46,46 @@
  {
   "id": "minneriya",
   "nome": "Minneriya National Park",
-  "tipo": "natura",
-  "icona": "🌋",
+  "tipo": "safari",
+  "icona": "🦁",
   "zona": "Triangolo Culturale",
   "lat": 8.016145,
   "lon": 80.850139,
   "bot": "https://t.me/viaggiosrilanka_bot?start=safari_minneriya",
   "osm": "https://www.openstreetmap.org/relation/5683596"
+ },
+ {
+  "id": "kaudulla",
+  "nome": "Kaudulla National Park",
+  "tipo": "safari",
+  "icona": "🦁",
+  "zona": "Triangolo Culturale",
+  "lat": 8.175811,
+  "lon": 80.914555,
+  "bot": "https://t.me/viaggiosrilanka_bot?start=safari_minneriya",
+  "osm": "https://www.openstreetmap.org/relation/9134268"
+ },
+ {
+  "id": "hurulu",
+  "nome": "Hurulu Eco Park",
+  "tipo": "safari",
+  "icona": "🦁",
+  "zona": "Triangolo Culturale",
+  "lat": 8.05817,
+  "lon": 80.770118,
+  "bot": "https://t.me/viaggiosrilanka_bot?start=safari_minneriya",
+  "osm": "https://www.openstreetmap.org/node/7235296085"
+ },
+ {
+  "id": "wasgamuwa",
+  "nome": "Wasgamuwa National Park",
+  "tipo": "safari",
+  "icona": "🦁",
+  "zona": "Triangolo Culturale",
+  "lat": 7.743413,
+  "lon": 80.915697,
+  "bot": "https://t.me/viaggiosrilanka_bot?start=safari",
+  "osm": "https://www.openstreetmap.org/relation/6315786"
  },
  {
   "id": "dambulla",
@@ -585,8 +618,8 @@
  {
   "id": "kumana",
   "nome": "Kumana National Park (Lagoon Safari)",
-  "tipo": "natura",
-  "icona": "🌋",
+  "tipo": "safari",
+  "icona": "🦁",
   "zona": "Costa Est",
   "lat": 6.618678,
   "lon": 81.664996,
@@ -706,24 +739,57 @@
  {
   "id": "yala",
   "nome": "Parco Nazionale di Yala",
-  "tipo": "natura",
-  "icona": "🌋",
+  "tipo": "safari",
+  "icona": "🦁",
   "zona": "Costa Sud",
   "lat": 6.570972,
   "lon": 81.507282,
-  "bot": "https://t.me/viaggiosrilanka_bot",
+  "bot": "https://t.me/viaggiosrilanka_bot?start=safari",
   "osm": "https://www.openstreetmap.org/relation/16908453"
  },
  {
   "id": "udawalawe",
   "nome": "Parco Nazionale di Udawalawe",
-  "tipo": "natura",
-  "icona": "🌋",
+  "tipo": "safari",
+  "icona": "🦁",
   "zona": "Costa Sud",
   "lat": 6.512158,
   "lon": 80.887626,
-  "bot": "https://t.me/viaggiosrilanka_bot",
+  "bot": "https://t.me/viaggiosrilanka_bot?start=safari",
   "osm": "https://www.openstreetmap.org/relation/10550498"
+ },
+ {
+  "id": "bundala",
+  "nome": "Parco Nazionale di Bundala",
+  "tipo": "safari",
+  "icona": "🦁",
+  "zona": "Costa Sud",
+  "lat": 6.209855,
+  "lon": 81.225177,
+  "bot": "https://t.me/viaggiosrilanka_bot?start=safari",
+  "osm": "https://www.openstreetmap.org/relation/5407631"
+ },
+ {
+  "id": "gal_oya",
+  "nome": "Parco Nazionale di Gal Oya",
+  "tipo": "safari",
+  "icona": "🦁",
+  "zona": "Costa Est",
+  "lat": 7.190074,
+  "lon": 81.458812,
+  "bot": "https://t.me/viaggiosrilanka_bot?start=safari",
+  "osm": "https://www.openstreetmap.org/relation/18422607"
+ },
+ {
+  "id": "wilpattu",
+  "nome": "Parco Nazionale di Wilpattu",
+  "tipo": "safari",
+  "icona": "🦁",
+  "zona": "Costa Ovest",
+  "lat": 8.449651,
+  "lon": 80.01673,
+  "bot": "https://t.me/viaggiosrilanka_bot?start=safari",
+  "osm": "https://www.openstreetmap.org/relation/15434166"
  },
  {
   "id": "jaffna",

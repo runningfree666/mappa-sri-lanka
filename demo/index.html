@@ -89,7 +89,7 @@
 const tg = window.Telegram && Telegram.WebApp;
 if (tg && tg.initData !== undefined) { tg.ready(); tg.expand(); }
 const TIPI = {attrazione: "🏛️ Attrazioni", museo: "🖼️ Musei", paese: "🏘️ Paesi",
-              spiaggia: "🏖️ Spiagge", natura: "🌋 Natura", trek: "🥾 Trek"};
+              spiaggia: "🏖️ Spiagge", natura: "🌋 Natura", safari: "🦁 Safari", trek: "🥾 Trek"};
 const attivi = new Set(Object.keys(TIPI));
 let zona = "", posti = [], markers = [], linee = [], estremi = [], me = null;
 const TRACCIA = {color: "#d9480f", weight: 4, opacity: .85};
