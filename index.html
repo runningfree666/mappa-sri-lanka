@@ -124,9 +124,10 @@ function scheda(p) {
   const btnT = t && t.linea ? `<div class="btns"><button class="btn" id="b-trk">🥾 Mostra percorso</button>${t.fonte ? '<button class="btn" id="b-gpx">⬇️ GPX (Wikiloc)</button>' : ""}</div>` : "";
   const cred = f ? `<div class="credit">Foto: ${esc(f.autore)} · ${esc(f.licenza)} · <a href="${esc(f.pagina)}" target="_blank" rel="noopener">Wikimedia Commons</a></div>` : "";
   apri(`${img}<h2>${p.icona} ${esc(p.nome)}</h2><div class="meta">${esc(TIPI[p.tipo].split(" ").slice(1).join(" "))} · ${esc(p.zona)}${dist(p)}</div>${nota}
-    <div class="btns"><button class="btn primary" id="b-bot">📖 Apri nel bot</button><button class="btn" id="b-nav">🧭 Portami qui</button></div>${btnT}
+    <div class="btns"><button class="btn primary" id="b-bot">📖 Apri nel bot</button>${p.notion ? '<button class="btn" id="b-notion">📝 Apri su Notion</button>' : ""}<button class="btn" id="b-nav">🧭 Portami qui</button></div>${btnT}
     ${cred}${t && t.fonte ? `<div class="credit">Traccia: <a href="${esc(t.fonte)}" target="_blank" rel="noopener">Wikiloc</a></div>` : ""}${t ? "" : `<div class="credit">Posizione: <a href="${esc(p.osm)}" target="_blank" rel="noopener">OpenStreetMap</a></div>`}`);
   document.getElementById("b-bot").onclick = () => vaiLink(p.bot, true);
+  if (p.notion) document.getElementById("b-notion").onclick = () => vaiLink(p.notion, false);
   if (t && t.linea) {
     document.getElementById("b-trk").onclick = () => percorso(p);
     if (t.fonte) document.getElementById("b-gpx").onclick = () => vaiLink(t.fonte, false);
